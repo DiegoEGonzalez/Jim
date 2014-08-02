@@ -11,16 +11,12 @@ import java.util.ArrayList;
 
 public class Game extends JPanel{
 
-
-    BufferedImage jim = null;
     BufferedImage back = null;
 
     ArrayList <Other> guys = new ArrayList<Other>();
-    int x=0;
-    int y=0;
-    int dx=0;
-    int dy=0;
+    int id = 0;
     public Game(){
+
         //********** JPANEL SPECIFICS ***********
         setLayout(null);//designates that the JPanel has no layout and allows us to align elements within it using (x,y)
         setSize(GameEngine.DEFAULT_WINDOWSIZEX, GameEngine.DEFAULT_WINDOWSIZEY);//set's the size of our JPanel
@@ -32,7 +28,7 @@ public class Game extends JPanel{
     //--------------- A ---------------------
     Action left = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
-                dx=-6;
+                guys.get(id).dx=-6;
         }
     };
     {
@@ -41,7 +37,7 @@ public class Game extends JPanel{
 
         Action leftReleased = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                dx=0;
+                guys.get(id).dx=0;
             }
         };
         getInputMap().put(KeyStroke.getKeyStroke("released A"),
@@ -52,7 +48,7 @@ public class Game extends JPanel{
         // ---------------- D ---------------------
         Action right = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                   dx=6;
+                guys.get(id).dx=6;
             }
         };
 
@@ -62,7 +58,7 @@ public class Game extends JPanel{
                 right);
         Action rightReleased = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                dx=0;
+                guys.get(id).dx=0;
             }
         };
         getInputMap().put(KeyStroke.getKeyStroke("released D"),
@@ -73,7 +69,7 @@ public class Game extends JPanel{
         //--------------- W ---------------------
         Action up = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                dy=-6;
+                guys.get(id).dy=-6;
             }
         };
 
@@ -82,7 +78,7 @@ public class Game extends JPanel{
 
             Action upReleased = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
-                    dy = 0;
+                    guys.get(id).dy = 0;
                 }
             };
             getInputMap().put(KeyStroke.getKeyStroke("released W"),
@@ -93,7 +89,7 @@ public class Game extends JPanel{
             // ---------------- S ---------------------
             Action down = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
-                    dy = 6;
+                    guys.get(id).dy = 6;
                 }
             };
 
@@ -103,7 +99,7 @@ public class Game extends JPanel{
                     down);
             Action downReleased = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
-                    dy = 0;
+                    guys.get(id).dy = 0;
                 }
             };
             getInputMap().put(KeyStroke.getKeyStroke("released S"),
@@ -122,58 +118,80 @@ public class Game extends JPanel{
             getActionMap().put("ESC",
                     esc);
 
+            // ---------- SPACE -------------
+
+        Action space = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                guys.get(id).user=false;
+                if(guys.size()>id+1)
+                    id++;
+                else if (guys.size()>1)
+                    id--;
+                guys.get(id).user=true;
+
+            }
+        };
+        getInputMap().put(KeyStroke.getKeyStroke("SPACE"),
+                "SPACE");
+        getActionMap().put("SPACE",
+                space);
+
 
             try {
-                jim = ImageIO.read(new File("jim.jpg"));
                 back = ImageIO.read(new File("back.jpg"));
-                AffineTransform trans = new AffineTransform();
-                trans.scale(.15, .15);
-                AffineTransformOp apply = new AffineTransformOp(trans, AffineTransformOp.TYPE_BILINEAR);
-                jim = apply.filter(jim, null);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             guys.add(new Other());
+            guys.get(id).user=true;
 
         }
 
     public void update(){
-        x+=dx;
-        y+=dy;
-
         for(int x=0;x<guys.size();x++){
             guys.get(x).update();
+        }
+        if(Math.random()<.001){
+            guys.add(new Other());
         }
     }
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);//clears the display
+
         g.setColor(Color.WHITE);
-        g.drawImage(back,-400-x,-300-y,null);
-        g.drawImage(jim,500,600,null);
+        g.drawImage(back,-400-guys.get(id).x,-300-guys.get(id).y,null);
+
         g.drawString("hello, welcome jim",100,100);
 
+        /**
         if(collision()) {
             g.fillRect(500, 600, jim.getWidth(), jim.getHeight());
             this.x+=guys.get(0).dx;
         }else {
             g.drawRect(500, 600, jim.getWidth(), jim.getHeight());
         }
+
+
+
         g.drawRect(0,600+jim.getHeight()-y,GameEngine.DEFAULT_WINDOWSIZEX,100);
 
+
+        **/
         for(int x=0;x<guys.size();x++){
-            guys.get(x).draw(g,this.x,y);
+            guys.get(x).draw(g,guys.get(id).x,guys.get(id).y);
         }
 
     }
-
+    /**
     public boolean collision(){
         for(int x=0;x<guys.size();x++){
             boolean up=((guys.get(x).y-this.y)<600+jim.getHeight());
-            boolean down=(guys.get(x).y-this.y)+guys.get(x).guy.getHeight()>(600);
+            boolean down=(guys.get(x).y-this.y)+guys.get(x).img.getHeight()>(600);
             boolean left=((guys.get(x).x-this.x)<500+jim.getWidth());
-            boolean right=(guys.get(x).x-this.x)+guys.get(x).guy.getWidth()>(500);
+            boolean right=(guys.get(x).x-this.x)+guys.get(x).img.getWidth()>(500);
 
             if(left&&right&&up&&down){
                 return true;
@@ -181,5 +199,6 @@ public class Game extends JPanel{
         }
         return false;
     }
+    **/
 
 }
