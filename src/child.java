@@ -1,6 +1,4 @@
-/**
- * Created by DiegoGonzalez on 7/31/14.
- */
+
 public class child extends human {
 
 
